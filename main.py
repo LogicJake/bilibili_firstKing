@@ -120,11 +120,14 @@ def get_attentions(var,type=0):        #获取关注者的mid
         send_mail(0, e, name)
 
 if __name__ == '__main__':
+    interval = 1
+    mid = 15193611
+    attentions = get_attentions(mid, 1)  # 根据mid获取关注列表
     cookie = get_cookie()                               #获取cookie
-    send_comment(121212132, "21212", cookie)  # 发表评论
-    # attentions = get_attentions(15193611,1)             #根据mid获取关注列表
-    # for attention in attentions:
-    #     flag = new_post(attention)  # 检查是否有新视频发布
-    #     if flag != None:
-    #         content = get_content()  # 获取评论内容
-    #         send_comment(flag['aid'], content, cookie)  # 发表评论
+    while True:
+        for attention in attentions:
+            flag = new_post(attention)  # 检查是否有新视频发布
+            if flag != None:
+                content = get_content()  # 获取评论内容
+                send_comment(flag['aid'], content, cookie)  # 发表评论
+        time.sleep(interval * 60)  # 休眠interval*60s
