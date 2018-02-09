@@ -46,7 +46,8 @@ def send_comment(av,message,cookie):
     except Exception as e:
         send_mail(0,e,av)
 
-def get_content():      #自定义需要回复的评论
+def get_content(info):      #自定义需要回复的评论
+    print(info)
     return "我住在b站了"
 
 def new_post(mid):
@@ -64,13 +65,15 @@ def new_post(mid):
         response = requests.get(url,headers=headers)
         result = {}
         res = json.loads(response.text)['data']['vlist'][0]
+        result['mid'] = res.get('mid',0)
         result['created_time'] = res.get('created',0)
         result['description'] = res.get('description','null')
         result['title'] = res.get('title','null')
         result['aid'] = res.get('aid',0)
-        if int(time.time())-result['created_time'] < 60:      #在1min之内证明是最新投稿
+        if int(time.time())-result['created_time'] < 30:      #在1min之内证明是最新投稿
             return result
-        return None
+        else:
+            return None
     except Exception as e:
         send_mail(0,e,mid)
 
@@ -120,7 +123,7 @@ def get_attentions(var,type=0):        #获取关注者的mid
         send_mail(0, e, name)
 
 if __name__ == '__main__':
-    interval = 1
+    interval = 0.2
     mid = 15193611
     attentions = get_attentions(mid, 1)  # 根据mid获取关注列表
     cookie = get_cookie()                               #获取cookie
@@ -128,6 +131,6 @@ if __name__ == '__main__':
         for attention in attentions:
             flag = new_post(attention)  # 检查是否有新视频发布
             if flag != None:
-                content = get_content()  # 获取评论内容
+                content = get_content(flag)  # 获取评论内容
                 send_comment(flag['aid'], content, cookie)  # 发表评论
         time.sleep(interval * 60)  # 休眠interval*60s
